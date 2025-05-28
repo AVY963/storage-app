@@ -1,0 +1,20 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "encryptedapp",
+  "outputfilename": "encryptedapp",
+  "author": {
+    "name": "AVY963",
+    "email": "akritas.vladimir@yandex.ru"
+  },
+  "frontend": {
+    "dir": "../frontend",
+    "build": {
+      "cmd": "npm run build",
+      "bin": "dist",
+      "install": "npm install"
+    }
+  },
+  "output": {
+    "directory": "build"
+  }
+}
