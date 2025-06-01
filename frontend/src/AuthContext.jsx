@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      console.log("hui:");
+
       const res = await fetch("http://localhost:8081/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -62,7 +62,6 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
-    console.log("pizda:");
     if (!validateForm() || isSubmitting) {
       return;
     }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { EncryptAndPrepareFile, DecryptReceivedFile, SaveDownloadedFile } from '../wailsjs/go/main/App';
 import { 
   Box, 
   Typography, 
@@ -90,10 +91,38 @@ export default function FileManager() {
       setUploading(true);
       setUploadProgress(0);
       
-      const formData = new FormData();
-      formData.append('file', file);
+      // Читаем содержимое файла
+      const fileBuffer = await file.arrayBuffer();
+      const fileData = new Uint8Array(fileBuffer);
       
-      // Используем XMLHttpRequest для отслеживания прогресса загрузки
+      // Шифруем файл перед отправкой
+      const encryptedData = await EncryptAndPrepareFile(Array.from(fileData));
+      
+      // console.log('Encrypted data received:', {
+      //   file_length: encryptedData.encrypted_file.length,
+      //   key_length: encryptedData.encrypted_key.length,
+      //   nonce_length: encryptedData.nonce.length
+      // });
+
+      const formData = new FormData();
+      formData.append('file', new Blob([new Uint8Array(encryptedData.encrypted_file)]));
+      formData.append('key', new Blob([new Uint8Array(encryptedData.encrypted_key)])); // Передаем зашифрованный ключ в base64
+      formData.append('nonce', new Blob([new Uint8Array(encryptedData.nonce)]));
+      formData.append('filename', file.name);
+      
+      // Проверяем содержимое FormData
+      console.log('FormData contents:');
+      for (let pair of formData.entries()) {
+        if (pair[0] === 'key') {
+          console.log('key length:', pair[1].length);
+        } else if (pair[0] === 'file' || pair[0] === 'nonce') {
+          console.log(`${pair[0]} size:`, pair[1].size);
+        } else {
+          console.log(pair[0], pair[1]);
+        }
+      }
+      
+      // Отправляем на сервер
       const xhr = new XMLHttpRequest();
       xhr.open('POST', 'http://localhost:8081/api/files/upload');
       xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
@@ -106,8 +135,8 @@ export default function FileManager() {
       });
       
       xhr.onload = () => {
-        console.log("Статус ответа загрузки:", xhr.status);
-        console.log("Ответ загрузки:", xhr.responseText);
+        // console.log("Статус ответа загрузки:", xhr.status);
+        // console.log("Ответ загрузки:", xhr.responseText);
         
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
@@ -172,7 +201,7 @@ export default function FileManager() {
       
       try {
         const data = await res.json();
-        console.log("Ответ сервера (JSON):", data);
+        console.log("Received data:", data);
         
         let filesList = [];
         
@@ -232,41 +261,44 @@ export default function FileManager() {
     
     try {
       setLoading(true);
-      console.log(`Скачивание файла: ${filename}`);
       
       const res = await fetch(`http://localhost:8081/api/files/download/${encodeURIComponent(filename)}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       
-      console.log("Статус ответа скачивания:", res.status);
-      
       if (!res.ok) {
-        let errorMessage = `Ошибка при скачивании файла: ${res.status}`;
-        try {
-          const errorData = await res.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // Если ответ не в формате JSON, используем стандартное сообщение
-        }
-        
-        throw new Error(errorMessage);
+        throw new Error('Ошибка при скачивании файла');
+      }
+
+      const data = await res.json();
+      
+      // Проверяем наличие всех необходимых данных
+      if (!data.file || !data.key || !data.nonce) {
+        throw new Error('Получены неполные данные с сервера');
+      }
+
+      // Расшифровываем файл
+      const decryptedData = await DecryptReceivedFile(
+        data.file,
+        data.key,
+        data.nonce
+      );
+
+      if (!decryptedData || decryptedData.length === 0) {
+        throw new Error('Не удалось расшифровать данные');
+      }
+
+      // Сохраняем файл через нативный диалог
+      try {
+        await SaveDownloadedFile(decryptedData, filename);
+        setSuccess('Файл успешно сохранен');
+      } catch (err) {
+        throw new Error(`Ошибка при сохранении файла: ${err.message}`);
       }
       
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      console.log(`Файл ${filename} успешно скачан`);
-      setSuccess('Файл успешно скачан');
     } catch (err) {
-      console.error("Ошибка при скачивании:", err);
-      setError(err.message || 'Не удалось скачать файл');
+      console.error("Ошибка при скачивании файла:", err);
+      setError(err.message || 'Произошла ошибка при скачивании файла');
     } finally {
       setLoading(false);
     }

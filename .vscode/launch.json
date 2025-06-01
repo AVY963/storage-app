@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Wails: Production encryptedapp",
+        "type": "go",
+        "request": "launch",
+        "mode": "exec",
+        "program": "${workspaceFolder}/build/bin/encryptedapp",
+        "preLaunchTask": "build",
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "name": "Wails: Debug encryptedapp",
+        "type": "go",
+        "request": "launch",
+        "mode": "exec",
+        "program": "${workspaceFolder}/build/bin/encryptedapp",
+        "preLaunchTask": "build debug",
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "name": "Wails: Dev encryptedapp",
+        "type": "go",
+        "request": "launch",
+        "mode": "exec",
+        "program": "${workspaceFolder}/build/bin/encryptedapp",
+        "preLaunchTask": "build dev",
+        "cwd": "${workspaceFolder}"
+      },
+    ]
+  }

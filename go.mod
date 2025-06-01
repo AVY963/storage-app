@@ -1,4 +1,4 @@
-module myapp
+module github.com/AVY963/storage-app
 
 go 1.24.3
 
