@@ -5,4 +5,4 @@ export function DecryptReceivedFile(arg1:string,arg2:string,arg3:Array<number>):
 
 export function EncryptAndPrepareFile(arg1:any):Promise<Record<string, any>>;
 
-export function SaveDownloadedFile(data:Array<number>, defaultFilename:string):Promise<void>;
+export function SaveDownloadedFile(arg1:Array<number>,arg2:string):Promise<void>;

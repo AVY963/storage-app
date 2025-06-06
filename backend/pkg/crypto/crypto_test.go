@@ -59,7 +59,7 @@ func TestDecryptInvalidKey(t *testing.T) {
 
 	data := &EncryptedData{
 		EncryptedFile:   []byte{1, 2, 3},
-		EncryptedAESKey: base64.StdEncoding.EncodeToString([]byte("invalid")), // некорректный AES ключ
+		EncryptedAESKey: base64.StdEncoding.EncodeToString([]byte("invalid")),
 		Nonce:           []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
 	}
 

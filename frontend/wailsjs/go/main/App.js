@@ -10,6 +10,6 @@ export function EncryptAndPrepareFile(arg1) {
   return window['go']['main']['App']['EncryptAndPrepareFile'](arg1);
 }
 
-export function SaveDownloadedFile(data, defaultFilename) {
-  return window['go']['main']['App']['SaveDownloadedFile'](data, defaultFilename);
+export function SaveDownloadedFile(arg1, arg2) {
+  return window['go']['main']['App']['SaveDownloadedFile'](arg1, arg2);
 }

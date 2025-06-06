@@ -49,9 +49,6 @@ func (fe *FileEncryption) EncryptFile(fileData []byte) (*EncryptedData, error) {
 		return nil, fmt.Errorf("error encrypting AES key: %v", err)
 	}
 
-	// Кодируем зашифрованный ключ в base64
-	// keyString := newFunction(encryptedKey)
-
 	// Создаем AES-GCM шифр
 	block, err := aes.NewCipher(aesKey)
 	if err != nil {
@@ -77,11 +74,6 @@ func (fe *FileEncryption) EncryptFile(fileData []byte) (*EncryptedData, error) {
 		EncryptedAESKey: string(encryptedKey),
 		Nonce:           nonce,
 	}, nil
-}
-
-func newFunction(encryptedKey []byte) string {
-	keyString := base64.StdEncoding.EncodeToString(encryptedKey)
-	return keyString
 }
 
 // DecryptFile расшифровывает файл

@@ -76,27 +76,13 @@ func (a *App) EncryptAndPrepareFile(file interface{}) (map[string]interface{}, e
 
 // DecryptReceivedFile расшифровывает полученный с сервера файл
 func (a *App) DecryptReceivedFile(encryptedFile string, encryptedKey string, nonce []byte) ([]interface{}, error) {
-	// Преобразуем входные данные в []byte
-	// encKey, err := interfaceArrayToBytes(encryptedKey)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("invalid encrypted key: %v", err)
-	// }
+
 	encrypted_file, err := base64.StdEncoding.DecodeString(encryptedFile)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding encrypted file: %v", err)
 	}
 
-	// encFile, err := interfaceArrayToBytes(encryptedFile)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("invalid encrypted file: %v", err)
-	// }
-
-	// nonceBytes, err := interfaceArrayToBytes(nonce)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("invalid nonce: %v", err)
-	// }
-
-	// // Создаем структуру с зашифрованными данными
+	// Создаем структуру с зашифрованными данными
 	encData := &crypto.EncryptedData{
 		EncryptedFile:   encrypted_file,
 		EncryptedAESKey: encryptedKey,
@@ -117,24 +103,6 @@ func (a *App) DecryptReceivedFile(encryptedFile string, encryptedKey string, non
 
 	return result, nil
 }
-
-//interfaceArrayToBytes преобразует массив интерфейсов в []byte
-// func interfaceArrayToBytes(data interface{}) ([]byte, error) {
-// 	arr, ok := data.([]interface{})
-// 	if !ok {
-// 		return nil, fmt.Errorf("expected array of numbers")
-// 	}
-
-// 	result := make([]byte, len(arr))
-// 	for i, v := range arr {
-// 		num, ok := v.(float64)
-// 		if !ok {
-// 			return nil, fmt.Errorf("invalid array element type at index %d", i)
-// 		}
-// 		result[i] = byte(num)
-// 	}
-// 	return result, nil
-// }
 
 // SaveDownloadedFile сохраняет расшифрованные данные в файл через нативный диалог
 func (a *App) SaveDownloadedFile(data []byte, defaultFilename string) error {
